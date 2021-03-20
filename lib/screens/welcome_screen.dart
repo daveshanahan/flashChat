@@ -8,11 +8,48 @@ class WelcomeScreen extends StatefulWidget {
   _WelcomeScreenState createState() => _WelcomeScreenState();
 }
 
-class _WelcomeScreenState extends State<WelcomeScreen> {
+class _WelcomeScreenState extends State<WelcomeScreen>
+    // Mixin is an extension we can add to a class to give it new properties or abilities
+    with
+        SingleTickerProviderStateMixin {
+  AnimationController controller;
+  Animation animation;
+
+  @override
+  void initState() {
+    super.initState();
+
+    controller = AnimationController(
+      // this refers to _WelcomeScreenState
+      vsync: this,
+      duration: Duration(seconds: 1),
+    );
+
+    animation = ColorTween(
+      begin: Colors.blueGrey,
+      end: Colors.white,
+    ).animate(controller);
+    // tells the animation to proceed
+    controller.forward();
+
+    // to see what the controller is doing, add a listener
+    controller.addListener(() {
+      // don't actually have to put anything in setstate here but just add it
+      setState(() {});
+      print(animation.value);
+    });
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: animation.value,
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 24.0),
         child: Column(
@@ -25,6 +62,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   tag: 'logo',
                   child: Container(
                     child: Image.asset('images/logo.png'),
+                    // curved animation upper bound can't be greater than 1 so we can multiply value buy 100 to exagerate it
                     height: 60.0,
                   ),
                 ),
